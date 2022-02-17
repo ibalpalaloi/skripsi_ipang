@@ -7,211 +7,133 @@ use App\Kriteria;
 use App\Skpd;
 use App\Produk;
 use App\Hasil_penilaian;
+use App\Kantor;
+use App\Tenaga_teknis;
+use App\Variabel_penilaian;
+use App\Wilayah;
 
 class PenilaianController extends Controller
 {
-	public function Penilaian()
-	{
-		$data_skpd = \App\Skpd::all();
-        $data_produk = \App\Produk::all();
-    	$data_penilaian = \App\Penilaian::all();
-		return view('penilaian.penilaian',['data_penilaian' => $data_penilaian,'data_skpd' => $data_skpd,'data_produk' => $data_produk]);
+	public function kantor(){
+		if(Auth()->user()->role == "admin"){
+			$wilayah = Wilayah::where('id', Auth()->user()->user_wilayah->wilayah_id)->get();
+		}
+		else{
+			$wilayah = Wilayah::all();
+		}
+		return view('/penilaian.daftar_kantor', compact('wilayah'));
 	}
-	
-	public function nilai(Request $request){
-		$this->validate($request,[
-            'skpd' => 'required',
-            'produk' => 'required'
-        ]);
-		$kriteria = Kriteria::all();
-		$skpd = Skpd::find($request->skpd);
-		$produk = Produk::find($request->produk);
-		$nilai_k = array();
-		$k='k';
-		$parameter_k = array();
-		for($i = 1; $i<21; $i++){
-			$k_ = $k.$i;
-			array_push($nilai_k, $request->$k_);
-			if($request->$k_ == 1){
-				array_push($parameter_k, 'Ya');
+
+	public function tenaga_teknis($id){
+		$tenaga_teknis = Tenaga_teknis::where('wilayah_id', $id)->get();
+		$data_tenaga_teknis = array();
+		$i = 0;
+		foreach($tenaga_teknis as $data){
+			$data_tenaga_teknis[$i]['id'] = $data->id;
+			$data_tenaga_teknis[$i]['nama'] = $data->nama;
+			$data_tenaga_teknis[$i]['no_registrasi'] = $data->no_registrasi;
+			if($data->hasil_penilaian){
+				$nilai = $data->hasil_penilaian->nilai;
+				$data_tenaga_teknis[$i]['nilai'] = $nilai;
+				if($nilai >= 0 && $nilai <= 50){
+					$rentang_nilai = 'Rendah';
+				}
+				elseif($nilai > 51 && $nilai <= 80){
+					$rentang_nilai = 'Sedang';
+				}
+				else{
+					$rentang_nilai = 'Tinggi';
+				}
+				$data_tenaga_teknis[$i]['rentang'] = $rentang_nilai;
+
 			}
 			else{
-				array_push($parameter_k, 'Tidak');
+				$data_tenaga_teknis[$i]['nilai'] = '-';
+				$data_tenaga_teknis[$i]['rentang'] = '-';
 			}
-			
+			$i++;
 		}
+ 		return view('penilaian.daftar_tenaga_teknis', compact('data_tenaga_teknis', 'id'));
+	}
 
-		$penilaian = Hasil_penilaian::where('produk_id', $produk->id)->delete();
-		$penilaian = new Hasil_penilaian;
-		$penilaian->skpd_id = $skpd->id;
-		$penilaian->produk_id = $produk->id;
-		$penilaian->kriteria_1 = $request->k1;
-		$penilaian->kriteria_2 =  $request->k2;
-		$penilaian->kriteria_3 = $request->k3;
-		$penilaian->kriteria_4 = $request->k4;
-		$penilaian->kriteria_5 = $request->k5;
-		$penilaian->kriteria_6 = $request->k6;
-		$penilaian->kriteria_7 = $request->k7;
-		$penilaian->kriteria_8 = $request->k8;
-		$penilaian->kriteria_9 = $request->k9;
-		$penilaian->kriteria_10 = $request->k10;
-		$penilaian->kriteria_11 = $request->k11;
-		$penilaian->kriteria_12 = $request->k12;
-		$penilaian->kriteria_13 = $request->k13;
-		$penilaian->kriteria_14 = $request->k14;
-		$penilaian->kriteria_15 = $request->k15;
-		$penilaian->kriteria_16 = $request->k16;
-		$penilaian->kriteria_17 = $request->k17;
-		$penilaian->kriteria_18 = $request->k18;
-		$penilaian->kriteria_19 = $request->k19;
-		$penilaian->kriteria_20 = $request->k20;
-		$penilaian->save();
+	public function penilaian($id){
+		$variabel_penilaian = Variabel_penilaian::all();
+		return view('penilaian.penilaian', compact('variabel_penilaian', 'id'));
+	}
 
-		$jumlah_bobot = 0;
-		$nilai_normalisasi = array();
-		foreach($kriteria as $data){
-			$jumlah_bobot += $data->bobot;
+	public function post_penilaian(Request $request, $id){
+		$data_request = $request->all();
+		$variabel_penilaian = Variabel_penilaian::all();
+		$data_variabel_penilaian = array();
+		$jumlah_bobot = Variabel_penilaian::sum('bobot');
+		$i = 0;
+		foreach($variabel_penilaian as $data){
+			$data_variabel_penilaian[$i]['id'] = $data->id;
+			$data_variabel_penilaian[$i]['variabel'] = $data->variabel;
+			$data_variabel_penilaian[$i]['bobot'] = $data->bobot;
+			$data_variabel_penilaian[$i]['nilai_normalisasi'] = $data->bobot / $jumlah_bobot;
+			$data_variabel_penilaian[$i]['nilai_variabel'] = $data_request['variabel_'.$data->id];
+			$data_variabel_penilaian[$i]['nilai_utility'] =  ($data_request['variabel_'.$data->id] - 0) / ( 4 - 0) * 100;
+
+			$i++;
 		}
-
-		foreach($kriteria as $data){
-			$nilai_normal = $data->bobot / $jumlah_bobot;
-			$nilai_normal = substr($nilai_normal, 0,5);
-			array_push($nilai_normalisasi, $nilai_normal);
-		}
-
-		$nilai_utility = array();
-		foreach($nilai_k as $data){
-			$i = (($data - 0) / (1-0)) * 100;
-			array_push($nilai_utility, $i);
-		}
-
-		$nilai_akhir=0;
-		for($i=0; $i<20; $i++){
-			$utility_normalisasi = $nilai_utility[$i] * $nilai_normalisasi[$i];
-			$nilai_akhir += $utility_normalisasi;
-		}
-
-		$produk = Produk::find($request->produk);
-		$produk->nilai = $nilai_akhir;
-		$produk->tahun_penilaian = date('Y');
-		$produk->save();
 		
-		return view('penilaian.hasil_penilaian', [
-			'nilai_normalisasi' => $nilai_normalisasi,
-			'parameter_k' => $parameter_k,
-			'kriteria' => $kriteria,
-			'nilai_utility'=>$nilai_utility,
-			'nilai_akhir'=>$nilai_akhir,
-			'skpd'=>$skpd,
-			'produk' => $produk
-		]);
+		$nilai_akhir = 0;
+
+		foreach($data_variabel_penilaian as $data){
+			$nilai_akhir += $data['nilai_utility'] * $data['nilai_normalisasi'];
+		}
+
+		if($nilai_akhir >= 0 && $nilai_akhir <= 50){
+			$hasil_rentang_nilai = "Rendah";
+		}
+		elseif($nilai_akhir > 50 && $nilai_akhir <= 80){
+			$hasil_rentang_nilai = "Sedang";
+		}
+		else{
+			$hasil_rentang_nilai = "Tinggi";
+		}
+
+		Hasil_penilaian::where('tenaga_teknis_id', $id)->delete();
+
+		$hasil_penilaian = new Hasil_penilaian;
+		$hasil_penilaian->tenaga_teknis_id = $id;
+		$hasil_penilaian->nilai = $nilai_akhir;
+		$hasil_penilaian->save();
+
+		return view('penilaian.hasil_penilaian', compact('data_variabel_penilaian', 'nilai_akhir', 'hasil_rentang_nilai'));
 	}
-   
-   public function hasil()
-   {
-	$skpd = Skpd::all();
-   	return view('penilaian.hasil', ['skpd'=> $skpd]);
-   }
 
-   public function layanan($id){
-	   $produk = Produk::where('skpd_id', $id)->get();
-	   $rata = 0;
-	   $bagi = 0;
-	   $tahun = date('Y');
-	   foreach($produk as $data){
-			if(empty($data->nilai)){
-				$nilai = 0;
+	public function print_tenaga_teknis($id){
+		$tenaga_teknis = Tenaga_teknis::where('wilayah_id', $id)->get();
+		$wilayah = Wilayah::find($id);
+		$data_tenaga_teknis = array();
+		$i = 0;
+		foreach($tenaga_teknis as $data){
+			$data_tenaga_teknis[$i]['id'] = $data->id;
+			$data_tenaga_teknis[$i]['nama'] = $data->nama;
+			$data_tenaga_teknis[$i]['no_registrasi'] = $data->no_registrasi;
+			if($data->hasil_penilaian){
+				$nilai = $data->hasil_penilaian->nilai;
+				$data_tenaga_teknis[$i]['nilai'] = $nilai;
+				if($nilai >= 0 && $nilai <= 50){
+					$rentang_nilai = 'Rendah';
+				}
+				elseif($nilai > 51 && $nilai <= 80){
+					$rentang_nilai = 'Sedang';
+				}
+				else{
+					$rentang_nilai = 'Tinggi';
+				}
+				$data_tenaga_teknis[$i]['rentang'] = $rentang_nilai;
+
 			}
 			else{
-				$nilai = $data->nilai;
+				$data_tenaga_teknis[$i]['nilai'] = '-';
+				$data_tenaga_teknis[$i]['rentang'] = '-';
 			}
-
-			$rata += $nilai;
-			$bagi++;
-	   }
-	   $rata = $rata / $bagi;
-	   if($rata >= 0 and $rata <=50){
-		   $hasil = 'Rendah';
-	   }
-	   elseif($rata >= 51 and $rata <=80){
-		   $hasil = 'Sedang';
-	   }
-	   else{
-		   $hasil = 'Tinggi';
-	   }
-	   return view('penilaian.layanan', ['produk'=>$produk, 'rata'=> $rata, 'hasil'=>$hasil]);
-   }
-
-   public function delete($id)
-   {
-   	$produk = Produk::find($request->$id)->delete();
-   	return redirect('/layanan/{id}')->with('Sukses','Data Berhasil Dihapus');
-   }
-
-   public function get_produk(Request $request){
-        $produk = \App\Produk::where('skpd_id', $request->id)->get();
-        $output =  '<option value=""></option>';
-        foreach($produk as $data){
-            $output .= '<option value="'.$data->id.'">'.$data->produk.'</option>';
-        }
-        echo $output;
-    }
-
-    public function detail($id){
-    	$penilaian = Hasil_penilaian::where('produk_id', $id)->first();
-    	$kriteria = Kriteria::all();
-		$skpd = Skpd::find($penilaian->skpd_id);
-		$produk = Produk::find($penilaian->produk_id);
-		$nilai_k = array();
-		$k='kriteria_';
-		$parameter_k = array();
-		for($i = 1; $i<21; $i++){
-			$k_ = $k.$i;
-			array_push($nilai_k, $penilaian->$k_);
-			if($penilaian->$k_ == 1){
-				array_push($parameter_k, 'Ya');
-			}
-			else{
-				array_push($parameter_k, 'Tidak');
-			}
-			
+			$i++;
 		}
-		$jumlah_bobot = 0;
-		$nilai_normalisasi = array();
-		foreach($kriteria as $data){
-			$jumlah_bobot += $data->bobot;
-		}
-
-		foreach($kriteria as $data){
-			$nilai_normal = $data->bobot / $jumlah_bobot;
-			$nilai_normal = substr($nilai_normal, 0,5);
-			array_push($nilai_normalisasi, $nilai_normal);
-		}
-
-		$nilai_utility = array();
-		foreach($nilai_k as $data){
-			$i = (($data - 0) / (1-0)) * 100;
-			array_push($nilai_utility, $i);
-		}
-
-		$nilai_akhir=0;
-		for($i=0; $i<20; $i++){
-			$utility_normalisasi = $nilai_utility[$i] * $nilai_normalisasi[$i];
-			$nilai_akhir += $utility_normalisasi;
-		}
-
-		$produk->nilai = $nilai_akhir;
-		$produk->tahun_penilaian = date('Y');
-		$produk->save();
-
-		return view('penilaian.detail_penilaian', [
-			'nilai_normalisasi' => $nilai_normalisasi,
-			'parameter_k' => $parameter_k,
-			'kriteria' => $kriteria,
-			'nilai_utility'=>$nilai_utility,
-			'nilai_akhir'=>$nilai_akhir,
-			'skpd'=>$skpd,
-			'produk' => $produk
-		]);
-    }
+		return view('penilaian.print_daftar_tenaga_teknis', compact('data_tenaga_teknis', 'id', 'wilayah'));
+	}
 }

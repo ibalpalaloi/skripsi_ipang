@@ -23,6 +23,7 @@ Data User
                            <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 200px; text-align: center;">Nama</th>
                            <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 200px; text-align: center;">Username</th>
                            <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 100px; text-align: center;">Role</th>
+                           <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 100px; text-align: center;">Wilayah</th>
                            <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 200px; text-align: center;">Tanggal Pembuatan</th>
                            <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 150px; text-align: center;">Aksi</th>
                       </tr>
@@ -35,9 +36,11 @@ Data User
                           <td>{{$user->name}}</td>
                           <td style="text-align: center;">{{$user->username}}</td>
                           <td style="text-align: center;">{{$user->role}}</td>
+                          <td style="text-align: center;">{{$user->user_wilayah->wilayah->wilayah}}</td>
                           <td style="text-align: center;">{{$user->created_at}}</td>
-                          <td><a href="/user/{{$user->id}}/edit"class="btn btn-success btn-xs mb-3">
-                                  <i class="fas fa-pencil-alt"></i></a>
+                          <td>
+                            {{-- <a href="/user/{{$user->id}}/edit"class="btn btn-success btn-xs mb-3">
+                                  <i class="fas fa-pencil-alt"></i></a> --}}
                               <a href="/user/{{$user->id}}/delete" class="btn btn-danger btn-xs mb-3" onclick="return confirm('Apakah anda yakin ingin menghapus data?')">
                                       <i class="fa fa-trash"></i></a>
                               </td>

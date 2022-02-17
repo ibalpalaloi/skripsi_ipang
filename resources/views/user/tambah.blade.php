@@ -16,10 +16,18 @@ Tambah Data User
             <div class="form-group {{$errors->has('skpd') ? 'has-error' : ''}}">
                 <label for="exampleFormControlSelect1">Role</label>
                 <select name="role" class="form-control" id="exampleFormControlSelect1">
-                  <option>Admin</option>
-                  <option>Pegawai</option>
+                  <option value="admin">Admin</option>
+                  <option value="superadmin">Super admin</option>
                 </select>
-              </div>
+            </div>
+            <div class="form-group {{$errors->has('skpd') ? 'has-error' : ''}}">
+              <label for="exampleFormControlSelect1">Role</label>
+              <select name="wilayah" class="form-control" id="exampleFormControlSelect1">
+                @foreach ($wilayah as $data)
+                  <option value="{{$data->id}}">{{$data->wilayah}}</option>
+                @endforeach
+              </select>
+          </div>
             <div class="form-group">
               <label for="exampleInputEmail1">Password</label>
               <input name="password" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Password">

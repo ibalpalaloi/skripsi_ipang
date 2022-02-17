@@ -47,16 +47,21 @@
               <li>
                 <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-pencil-ruler"></i><span>Data Wilayah Kerja & Tenaga Teknis</span></a>
                 <ul class="dropdown-menu">
-                  <li class="active"><a class="nav-link" href="/skpd">Input Data Wilaya Kerja</a></li>
-                  <li><a class="nav-link" href="/produk">Input Data Tenaga Teknis</a></li>
+                  @if (Auth()->user()->role == 'superadmin')
+                      <li class="active"><a class="nav-link" href="/wilayah">Input Data Wilaya Kerja</a></li>
+                  @endif
+                  
+                  <li><a class="nav-link" href="/tenaga_teknis">Input Data Tenaga Teknis</a></li>
                 </ul>
               </li>
-              <li><a class="nav-link" href="/penilai"><i class="far fa-file-alt"></i><span>Identitas Pengambil Data</span></a></li>
+              @if (Auth()->user()->role == 'superadmin')
+                <li><a class="nav-link" href="/variabel-penilaian"><i class="far fa-file-alt"></i><span>Variabel Penilaian</span></a></li>
+              @endif
+              
               <li>
                 <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i><span>Penilaian</span></a>
                 <ul class="dropdown-menu">
-                  <li class="active"><a class="nav-link" href="/penilaian">Input Penilaian</a></li>
-                  <li class="active"><a class="nav-link" href="/hasil">Hasil Penilaian</a></li>
+                  <li class="active"><a class="nav-link" href="/penilaian/kantor">Input Penilaian</a></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
@@ -64,6 +69,10 @@
                 <a href="/user"><i class="far fa-user"></i> <span>Manage User</span></a>
                 @endif
               </li>
+              @if (Auth()->user()->role == 'superadmin')
+                <li><a class="nav-link" href="/pengguna"><i class="far fa-file-alt"></i><span>Pengguna</span></a></li>
+              @endif
+              
         </aside>
       </div>
 

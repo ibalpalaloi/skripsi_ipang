@@ -36,4 +36,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function user_wilayah(){
+        return $this->hasOne(User_wilayah::class);
+    }
 }

@@ -11,35 +11,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $skpd = Skpd::all();
-        $SKPD = array();
-        $nilai_SKPD = array();
-        foreach($skpd as $data){
-            $bagi=0;
-            $nilai = 0;
-            foreach($data->produk as $produk){
-                if(empty($produk->nilai)){
-                    $nilai_produk = 0;
-                }
-                else{
-                    $nilai_produk = $produk->nilai;
-                }
-                $nilai += $nilai_produk;
-                $bagi++;
-            }
-            $nilai=$nilai/$bagi;
-            array_push($SKPD, $data->skpd);
-            array_push($nilai_SKPD, $nilai);
-        }
-        $nilai_total = 0;
-        $pembagi = 0;
-        foreach($nilai_SKPD as $data){
-            $nilai_total += $data;
-            $pembagi++;
-        }
-        $rata_rata = $nilai_total/$pembagi;
-        $rata_rata = substr($rata_rata, 0,5);
-    	return view('home.home', ['skpd'=>$SKPD, 'nilai_skpd'=>$nilai_SKPD, 'nilai_total'=>$nilai_total, 'rata_rata'=>$rata_rata]);
+        return redirect('/penilaian/kantor');
+    	// return view('home.home');
     }
 
     public function ExportSkpd()
