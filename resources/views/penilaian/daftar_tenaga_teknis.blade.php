@@ -44,3 +44,11 @@ Data kantor
     </table>
 </div>
 @endsection
+
+@section('footer')
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    } );
+</script>
+@endsection

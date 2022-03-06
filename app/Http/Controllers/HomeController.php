@@ -3,50 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Skpd;
-use App\Produk;
+use App\Tenaga_teknis;
 use PDF;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return redirect('/penilaian/kantor');
+        if(Auth()->user()->role == "admin"){
+            $tenaga_teknis = Tenaga_teknis::where('wilayah_id', Auth()->user()->user_wilayah->wilayah_id)->get();
+        }
+        else{
+            $tenaga_teknis = Tenaga_teknis::all();
+        }
+        
+		$data_tenaga_teknis = array();
+		$i = 0;
+		foreach($tenaga_teknis as $data){
+			$data_tenaga_teknis[$i]['id'] = $data->id;
+			$data_tenaga_teknis[$i]['nama'] = $data->nama;
+			$data_tenaga_teknis[$i]['no_registrasi'] = $data->no_registrasi;
+			if($data->hasil_penilaian){
+				$nilai = $data->hasil_penilaian->nilai;
+				$data_tenaga_teknis[$i]['nilai'] = $nilai;
+				if($nilai >= 0 && $nilai <= 50){
+					$rentang_nilai = 'Rendah';
+				}
+				elseif($nilai > 51 && $nilai <= 80){
+					$rentang_nilai = 'Sedang';
+				}
+				else{
+					$rentang_nilai = 'Tinggi';
+				}
+				$data_tenaga_teknis[$i]['rentang'] = $rentang_nilai;
+
+			}
+			else{
+				$data_tenaga_teknis[$i]['nilai'] = '-';
+				$data_tenaga_teknis[$i]['rentang'] = '-';
+			}
+			$i++;
+		}
+        return view('home.home', compact('data_tenaga_teknis'));
     	// return view('home.home');
     }
 
-    public function ExportSkpd()
-    {
-        $skpd = Skpd::all();
-        $SKPD = array();
-        $nilai_SKPD = array();
-        foreach($skpd as $data){
-            $bagi=0;
-            $nilai = 0;
-            foreach($data->produk as $produk){
-                if(empty($produk->nilai)){
-                    $nilai_produk = 0;
-                }
-                else{
-                    $nilai_produk = $produk->nilai;
-                }
-                $nilai += $nilai_produk;
-                $bagi++;
-            }
-            $nilai=$nilai/$bagi;
-            array_push($SKPD, $data->skpd);
-            array_push($nilai_SKPD, $nilai);
-        }
-        $nilai_total = 0;
-        $pembagi = 0;
-        foreach($nilai_SKPD as $data){
-            $nilai_total += $data;
-            $pembagi++;
-        }
-        $rata_rata = $nilai_total/$pembagi;
-        $rata_rata = substr($rata_rata, 0,5);
-
-       $pdf = PDF::loadView('home.cetak',['skpd'=>$SKPD, 'nilai_skpd'=>$nilai_SKPD, 'nilai_total'=>$nilai_total, 'rata_rata'=>$rata_rata]);
-       return $pdf->download('Hasil Penilaian Kepatuhan Standar Pelayanan Publik.pdf');
-    }
+    
 }

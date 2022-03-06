@@ -36,7 +36,17 @@ Data User
                           <td>{{$user->name}}</td>
                           <td style="text-align: center;">{{$user->username}}</td>
                           <td style="text-align: center;">{{$user->role}}</td>
-                          <td style="text-align: center;">{{$user->user_wilayah->wilayah->wilayah}}</td>
+                          @if ($user->user_wilayah)
+                            @if ($user->user_wilayah->wilayah)
+                                <td style="text-align: center;">{{$user->user_wilayah->wilayah->wilayah}}</td>
+                            @else
+                                <td style="text-align: center;">-</td>
+                            @endif
+                              
+                          @else
+                            <td style="text-align: center;">-</td>
+                          @endif
+                          
                           <td style="text-align: center;">{{$user->created_at}}</td>
                           <td>
                             {{-- <a href="/user/{{$user->id}}/edit"class="btn btn-success btn-xs mb-3">
