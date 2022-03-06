@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PenilaianController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,7 +30,9 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::get('/tenaga_teknis', 'TenagaTeknisController@tenaga_teknis');
 	Route::get('/tambah-tenaga-teknis', 'TenagaTeknisController@tambah_tenaga_teknis');
 	Route::post('/post-tenaga-teknis', 'TenagaTeknisController@post_tenaga_teknis');
+	Route::post('/post-ubah-tenaga-teknis', 'TenagaTeknisController@post_ubah_tenaga_teknis');
 	Route::get('/hapus-tenaga-teknis/{id}', 'TenagaTeknisController@hapus_tenaga_teknis');
+	Route::get('/ubah-tenaga-teknis/{id}', 'TenagaTeknisController@ubah_tenaga_teknis');
 
 	// wilayah
 	Route::get('/wilayah', 'WilayahController@wilayah');
@@ -54,7 +57,6 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::get('/ubah-variabel-penilaian/{id}', 'VariabelPenilaianController@ubah_variabel_penilaian');
 	Route::post('/post-ubah-variabel-penilaian/{id}', 'VariabelPenilaianController@post_ubah_variabel_penilaian');
 
-
 	// penilaian
 	Route::get('/penilaian/kantor', 'PenilaianController@kantor');
 	Route::get('/penilaian/tenaga-teknis/{id}', 'PenilaianController@tenaga_teknis');
@@ -67,5 +69,13 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::get('/user/tambah', 'UserController@tambah');
 	Route::get('/user/{id}/delete', 'UserController@delete');
 	Route::post('/user/create', 'UserController@create');
+
+	// 
+	Route::get('/parameter-penilaian/{id}', 'PenilaianController@parameter_penilaian');
+	Route::get('/tambah-parameter-penilaian/{id}', 'PenilaianController@tambah_parameter_penilaian');
+	Route::get('/hapus-parameter-penilaian/{id}', 'PenilaianController@hapus_parameter_penilaian');
+	Route::get('/ubah-parameter-penilaian/{id}', 'PenilaianController@ubah_parameter_penilaian');
+	Route::post('/post-parameter-penilaian/{id}', 'PenilaianController@post_parameter_penilaian');
+	Route::post('/post-ubah-parameter-penilaian/{id}', 'PenilaianController@post_ubah_parameter_penilaian');
 });
 

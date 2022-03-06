@@ -11,6 +11,8 @@ use App\Kantor;
 use App\Tenaga_teknis;
 use App\Variabel_penilaian;
 use App\Wilayah;
+use App\Parameter_penilaian;
+use Mockery\Generator\Parameter;
 
 class PenilaianController extends Controller
 {
@@ -58,11 +60,21 @@ class PenilaianController extends Controller
 
 	public function penilaian($id){
 		$variabel_penilaian = Variabel_penilaian::all();
-		return view('penilaian.penilaian', compact('variabel_penilaian', 'id'));
+		$data_variabel = array();
+		$i=0;
+		foreach($variabel_penilaian as $data){
+			$data_variabel[$i]['id'] = $data->id;
+			$data_variabel[$i]['variabel'] = $data->variabel;
+			$data_variabel[$i]['parameter'] =  Parameter_penilaian::where('variabel_penilaian_id', $data->id)->orderBy('nilai', 'asc')->get();
+			$i++;
+		}
+		// dd($data_variabel);
+		return view('penilaian.penilaian', compact('variabel_penilaian', 'id', 'data_variabel'));
 	}
 
 	public function post_penilaian(Request $request, $id){
 		$data_request = $request->all();
+		// dd($data_request);
 		$variabel_penilaian = Variabel_penilaian::all();
 		$data_variabel_penilaian = array();
 		$jumlah_bobot = Variabel_penilaian::sum('bobot');
@@ -73,7 +85,15 @@ class PenilaianController extends Controller
 			$data_variabel_penilaian[$i]['bobot'] = $data->bobot;
 			$data_variabel_penilaian[$i]['nilai_normalisasi'] = $data->bobot / $jumlah_bobot;
 			$data_variabel_penilaian[$i]['nilai_variabel'] = $data_request['variabel_'.$data->id];
-			$data_variabel_penilaian[$i]['nilai_utility'] =  ($data_request['variabel_'.$data->id] - 0) / ( 4 - 0) * 100;
+			$parameter_nilai_tertinggi = Parameter_penilaian::where('variabel_penilaian_id', $data->id)->orderBy('nilai', 'desc')->first();
+			if(!empty($parameter_nilai_tertinggi)){
+				$data_variabel_penilaian[$i]['nilai_utility'] =  ($data_request['variabel_'.$data->id] - 0) / ( $parameter_nilai_tertinggi->nilai - 0) * 100;
+
+			}
+			else{
+				$data_variabel_penilaian[$i]['nilai_utility'] =  0;
+
+			}
 
 			$i++;
 		}
@@ -135,5 +155,46 @@ class PenilaianController extends Controller
 			$i++;
 		}
 		return view('penilaian.print_daftar_tenaga_teknis', compact('data_tenaga_teknis', 'id', 'wilayah'));
+	}
+
+	public function parameter_penilaian($id){
+		$variabel_penilaian = Variabel_penilaian::find($id);
+		$parameter = Parameter_penilaian::where('variabel_penilaian_id', $id)->get();
+		return view('penilaian.parameter_penilaian', compact('parameter', 'id', 'variabel_penilaian'));
+	}
+
+	public function tambah_parameter_penilaian($id){
+		return view('penilaian.tambah_parameter_penilaian', compact('id'));
+	}
+
+	public function post_parameter_penilaian(Request $request, $id){
+		$parameter = new Parameter_penilaian;
+		$parameter->variabel_penilaian_id = $id;
+		$parameter->parameter = $request->parameter_penilaian;
+		$parameter->nilai = $request->nilai;
+		$parameter->save();
+
+		return redirect("/parameter-penilaian/".$id);
+	}
+
+	public function hapus_parameter_penilaian($id){
+		Parameter_penilaian::where('id', $id)->delete();
+
+		return back();
+	}
+
+	public function ubah_parameter_penilaian($id){
+		$parameter = Parameter_penilaian::find($id);
+
+		return view('penilaian.ubah_parameter_penilaian', compact('parameter', 'id'));
+	}
+
+	public function post_ubah_parameter_penilaian(Request $request, $id){
+		$parameter = Parameter_penilaian::find($id);
+		$parameter->parameter = $request->parameter_penilaian;
+		$parameter->nilai = $request->nilai;
+		$parameter->save();
+
+		return redirect('/parameter-penilaian/'.$parameter->variabel_penilaian_id);
 	}
 }

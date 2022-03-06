@@ -20,17 +20,25 @@ Form Penilaian
               @php
                   $no = 1;
               @endphp
-            @foreach ($variabel_penilaian as $data)
+            @foreach ($data_variabel as $data)
                 <tr>
                   <td>{{$no++}}</td>
-                  <td>{{$data->variabel}}</td>
+                  <td>{{$data['variabel']}}</td>
                   <td>
-                    <select name="variabel_{{$data->id}}" id="">
-                      <option value="0">Tidak Baik</option>
+                    <select name="variabel_{{$data['id']}}" id="">
+                      @if (count($data['parameter']) == 0)
+                        <option value="0">Tidak ada parameter</option>
+                      @else
+                          @foreach ($data['parameter'] as $parameter)
+                            <option value="{{$parameter->nilai}}">{{$parameter->parameter}}</option>
+                          @endforeach
+                      @endif
+                      
+                      {{-- <option value="0">Tidak Baik</option>
                       <option value="1">Kurang Baik</option>
                       <option value="2">Cukup Baik</option>
                       <option value="3">Baik</option>
-                      <option value="4">Sangat Baik</option>
+                      <option value="4">Sangat Baik</option> --}}
                     </select>
                   </td>
                 </tr>

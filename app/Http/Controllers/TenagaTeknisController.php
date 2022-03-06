@@ -15,7 +15,7 @@ class TenagaTeknisController extends Controller
             $tenaga_teknis = Tenaga_teknis::where('wilayah_id', Auth()->user()->user_wilayah->wilayah_id)->get();
         }
         else{
-            $tanaga_teknis = Tenaga_teknis::all();
+            $tenaga_teknis = Tenaga_teknis::all();
         }
         
         return view('tenaga_teknis.tenaga_teknis', compact('tenaga_teknis'));
@@ -26,8 +26,7 @@ class TenagaTeknisController extends Controller
         $tenaga_teknis->wilayah_id = $request->wilayah_id;
         $tenaga_teknis->no_registrasi = $request->no_registrasi;
         $tenaga_teknis->nama = $request->nama;
-        $tenaga_teknis->tempat_lahir = $request->tempat_lahir;
-        $tenaga_teknis->tgl_lahir = $request->tgl_lahir;
+        $tenaga_teknis->perusahaan = $request->perusahaan;
         $tenaga_teknis->save();
 
         return redirect('/tenaga_teknis');
@@ -46,5 +45,22 @@ class TenagaTeknisController extends Controller
 			$wilayah = Wilayah::all();
 		}
         return view('/tenaga_teknis.tambah_tanaga_teknis', compact('wilayah'));
+    }
+
+    public function ubah_tenaga_teknis($id){
+        $wilayah = Wilayah::all();
+        $tenaga_teknis = Tenaga_teknis::find($id);
+        return view('tenaga_teknis.ubah_tenaga_teknis', compact('tenaga_teknis', 'wilayah', 'id'));
+    }
+
+    public function post_ubah_tenaga_teknis(Request $request){
+        $tenaga_teknis = Tenaga_teknis::find($request->id);
+        $tenaga_teknis->wilayah_id = $request->wilayah_id;
+        $tenaga_teknis->no_registrasi = $request->no_registrasi;
+        $tenaga_teknis->nama = $request->nama;
+        $tenaga_teknis->perusahaan = $request->perusahaan;
+        $tenaga_teknis->save();
+
+        return redirect('/tenaga_teknis');
     }
 }

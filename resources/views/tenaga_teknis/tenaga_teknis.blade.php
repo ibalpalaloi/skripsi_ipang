@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('title')
-Data Wilayah
+Data Tenaga Teknis
 @endsection
 @section('body')
 <div class="container-fluid">
@@ -20,7 +20,7 @@ Data Wilayah
                               <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%; text-align: center;">No.</th>
                              <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;">Nama</th>
                              <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;">No Registrasi</th>
-                             <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;">Tgl Lahir</th>
+                             <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;">Perusahaan</th>
                              <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;">Kantor</th>
                              <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: ; text-align: center;"></th>
                         </tr>
@@ -34,9 +34,10 @@ Data Wilayah
                             <td style="text-align: center;">{{ $n++ }}.</td>
                             <td style="text-align: center;">{{$data->nama}}</td>
                             <td style="text-align: center;">{{$data->no_registrasi}}</td>
-                            <td style="text-align: center;">{{$data->tempat_lahir}}, {{$data->tgl_lahir}}</td>
+                            <td style="text-align: center;">{{$data->perusahaan}}</td>
                             <td style="text-align: center;">{{$data->wilayah->wilayah}}</td>
                             <td>
+                                <a href="/ubah-tenaga-teknis/{{$data->id}}" type="button" class="btn btn-success">ubah</a>
                                 <a href="/hapus-tenaga-teknis/{{$data->id}}" type="button" class="btn btn-danger">Hapus</a>
                             </td>
                         </tr>

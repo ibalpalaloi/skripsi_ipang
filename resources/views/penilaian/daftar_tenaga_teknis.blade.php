@@ -11,7 +11,7 @@ Data kantor
         {{session('Sukses')}}
     </div>
     @endif
-    <a target="blank ata-tenaga-teknis/{{$id}}" type="button" class="btn btn-primary">Print</a>
+    <a target="blank" href="/print-data-tenaga-teknis/{{$id}}" type="button" class="btn btn-primary">Print</a>
     <br><br>
     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
         <thead>
