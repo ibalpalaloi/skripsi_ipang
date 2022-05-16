@@ -26,7 +26,11 @@
         </form>
         <ul class="navbar-nav navbar-right" style="">
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-            <div class="d-sm-none d-lg-inline-block">Hi, {{auth()->user()->name}}</div></a>
+            <div class="d-sm-none d-lg-inline-block">
+              @auth
+                  Hi, {{auth()->user()->name}}
+              @endauth
+            </div></a>
             <div class="dropdown-menu dropdown-menu-right">
               <a href="/logout" class="dropdown-item has-icon text-danger">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -42,36 +46,46 @@
           </div>
           <ul class="sidebar-menu">
               <li class="nav-item dropdown">
-                <a href="/home" ><i class="fas fa-th-large"></i><span>Home</span></a>
+                <a href="/home-periode" ><i class="fas fa-th-large"></i><span>Home</span></a>
               </li>
               <li class="menu-header">Menu</li>
-              <li>
-                <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-pencil-ruler"></i><span>Data Wilayah Kerja & Tenaga Teknis</span></a>
-                <ul class="dropdown-menu">
-                  @if (Auth()->user()->role == 'superadmin')
-                      <li class="active"><a class="nav-link" href="/wilayah">Input Data Wilaya Kerja</a></li>
-                  @endif
-                  
-                  <li><a class="nav-link" href="/tenaga_teknis">Input Data Tenaga Teknis</a></li>
-                </ul>
-              </li>
-              @if (Auth()->user()->role == 'superadmin')
-                <li><a class="nav-link" href="/variabel-penilaian"><i class="far fa-file-alt"></i><span>Variabel Penilaian</span></a></li>
-              @endif
-              
-              <li>
-                <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i><span>Penilaian</span></a>
-                <ul class="dropdown-menu">
-                  <li class="active"><a class="nav-link" href="/penilaian/kantor">Input Penilaian</a></li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                @if(auth()->user()->role == 'Admin')
-                <a href="/user"><i class="far fa-user"></i> <span>Manage User</span></a>
+              @auth
+                <li>
+                  <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-pencil-ruler"></i><span>Data Wilayah Kerja & Tenaga Teknis</span></a>
+                  <ul class="dropdown-menu">
+                    @if (Auth()->user()->role == 'superadmin')
+                        <li class="active"><a class="nav-link" href="/wilayah">Input Data Wilaya Kerja</a></li>
+                    @endif
+                    
+                    <li><a class="nav-link" href="/tenaga_teknis">Input Data Tenaga Teknis</a></li>
+                  </ul>
+                </li>
+                @if (Auth()->user()->role == 'superadmin')
+                  <li><a class="nav-link" href="/variabel-penilaian"><i class="far fa-file-alt"></i><span>Variabel Penilaian</span></a></li>
                 @endif
-              </li>
-              @if (Auth()->user()->role == 'superadmin')
-                <li><a class="nav-link" href="/pengguna"><i class="far fa-file-alt"></i><span>Pengguna</span></a></li>
+                
+                <li>
+                  <a class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i><span>Penilaian</span></a>
+                  <ul class="dropdown-menu">
+                    <li class="active"><a class="nav-link" href="/penilaian/kantor">Input Penilaian</a></li>
+                  </ul>
+                </li>
+                <li><a class="nav-link" href="/periode"><i class="far fa-file-alt"></i><span>Periode</span></a></li>
+
+                <li class="nav-item dropdown">
+                  @if(auth()->user()->role == 'Admin')
+                  <a href="/user"><i class="far fa-user"></i> <span>Manage User</span></a>
+                  @endif
+                </li>
+                @if (Auth()->user()->role == 'superadmin')
+                  <li><a class="nav-link" href="/pengguna"><i class="far fa-file-alt"></i><span>Pengguna</span></a></li>
+                @endif
+              @endauth
+              @if (auth()->guest())
+                  <li class="nav-item dropdown">
+                    <a href="/login/login" ><i class="fas fa-th-large"></i><span>Login</span></a>
+                  </li>
+                  
               @endif
               
         </aside>

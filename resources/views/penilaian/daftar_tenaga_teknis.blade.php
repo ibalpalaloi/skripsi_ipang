@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('title')
-Data kantor
+Data Tenaga Teknis
 @endsection
 @section('body')
 <div class="container-fluid">
@@ -11,7 +11,7 @@ Data kantor
         {{session('Sukses')}}
     </div>
     @endif
-    <a target="blank" href="/print-data-tenaga-teknis/{{$id}}" type="button" class="btn btn-primary">Print</a>
+    <a target="blank" href="/print-data-tenaga-teknis/{{$id_kantor}}/{{$id_periode}}" type="button" class="btn btn-primary">Print</a>
     <br><br>
     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
         <thead>
@@ -36,7 +36,10 @@ Data kantor
                 <td style="text-align: center;">{{ $data['nilai']}}</td>
                 <td style="text-align: center;">{{ $data['rentang']}}</td>
                 <td>
-                    <a href="/penilaian-tenaga-teknis/{{$data['id']}}" type="button" class="btn btn-danger">Nilai</a>
+                    <a href="/penilaian-tenaga-teknis/{{$data['id']}}/{{$id_periode}}" type="button" class="btn btn-danger">Nilai</a>
+                    @if ($data['nilai'] != "-")
+                        <a href="/penilaian-tenaga-teknis/detail-penilaian/{{$data['id']}}/{{$id_periode}}" type="button" class="btn btn-warning">Detail</a>
+                    @endif
                 </td>
             </tr>
             @endforeach

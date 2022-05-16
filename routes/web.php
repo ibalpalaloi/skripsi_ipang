@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('auths.login'); 
+    return redirect('/home-periode'); 
 });
 
 
@@ -23,6 +23,9 @@ Route::get('/', function () {
 Route::get('/login/login','AuthController@login')->name('login');
 Route::post('/postlogin','AuthController@postlogin');
 Route::get('/logout','AuthController@logout');
+Route::get('/home/tenaga-teknis/{id}','HomeController@index');
+Route::get('/home-periode','HomeController@home_periode');
+Route::get('/penilaian-tenaga-teknis/detail-penilaian/{id}/{id_periode}', 'PenilaianController@detail_penilaian');
 
 Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 
@@ -46,7 +49,8 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::post('/post-kantor', 'KantorController@post_kantor');
 	Route::get('/hapus-kantor/{id}', 'KantorController@hapus_kantor');
 
-	Route::get('/home','HomeController@index');
+	
+	Route::get('/print-tenaga-teknis-home', 'HomeController@print_home');
 	Route::get('/home/exportskpd','HomeController@exportskpd');
 
 	// variabel penilaian
@@ -58,11 +62,13 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::post('/post-ubah-variabel-penilaian/{id}', 'VariabelPenilaianController@post_ubah_variabel_penilaian');
 
 	// penilaian
+	Route::get('/penilaian/periode/{id}', 'PenilaianController@periode');
 	Route::get('/penilaian/kantor', 'PenilaianController@kantor');
-	Route::get('/penilaian/tenaga-teknis/{id}', 'PenilaianController@tenaga_teknis');
-	Route::get('/penilaian-tenaga-teknis/{id}', 'PenilaianController@penilaian');
-	Route::post('/post_penilaian/{id}', 'PenilaianController@post_penilaian');
+	Route::get('/penilaian/tenaga-teknis/{id_kantor}/{id_periode}', 'PenilaianController@tenaga_teknis');
+	Route::get('/penilaian-tenaga-teknis/{id_tenaga_teknis}/{id_periode}', 'PenilaianController@penilaian');
+	Route::post('/post_penilaian/{id}/{id_periode}', 'PenilaianController@post_penilaian');
 	Route::get('/print-data-tenaga-teknis/{id}', 'PenilaianController@print_tenaga_teknis');
+	
 
 	// pengguna
 	Route::get('/pengguna', 'UserController@user');
@@ -77,5 +83,11 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::get('/ubah-parameter-penilaian/{id}', 'PenilaianController@ubah_parameter_penilaian');
 	Route::post('/post-parameter-penilaian/{id}', 'PenilaianController@post_parameter_penilaian');
 	Route::post('/post-ubah-parameter-penilaian/{id}', 'PenilaianController@post_ubah_parameter_penilaian');
+
+	Route::get('/periode', 'PeriodeController@periode');
+	Route::get('/periode/edit/{id}', 'PeriodeController@edit');
+	Route::get('/periode/tambah', 'PeriodeController@create');
+	Route::post('/periode/create', 'PeriodeController@create_post');
+	Route::post('/periode/post-edit', 'PeriodeController@post_edit');
 });
 

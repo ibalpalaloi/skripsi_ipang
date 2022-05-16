@@ -21,7 +21,7 @@ Ubah Variabel Penilaian
         </div>
         <div class="form-group">
             <label for="exampleInputEmail1">Bobot</label>
-            <input type="" class="form-control" name="bobot" value="{{$variabel_penilaian->bobot}}">
+            <input type="number" class="form-control" name="bobot" value="{{$variabel_penilaian->bobot}}">
           </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

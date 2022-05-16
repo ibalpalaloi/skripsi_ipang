@@ -40,6 +40,9 @@ Hasil Penilaian
           </tr>
         </tbody>
   </table>
+  <div>
+    <a href="/penilaian/tenaga-teknis/{{$id_wilayah}}/{{$id_periode}}" class="btn btn-primary">Kembali</a>
+  </div>
 
 </div>
 @endsection

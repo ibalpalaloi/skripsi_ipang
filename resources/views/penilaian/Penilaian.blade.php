@@ -4,7 +4,7 @@ Form Penilaian
 @endsection
 @section('body')
 <div class="container-fluid">
-  <form action="/post_penilaian/{{$id}}" method="post">
+  <form action="/post_penilaian/{{$id}}/{{$id_periode}}" method="post">
     @csrf
         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
           <thead>

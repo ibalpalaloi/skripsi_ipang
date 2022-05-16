@@ -49,3 +49,10 @@ Data Tenaga Teknis
     </div>
 </div>
 @endsection
+@section('footer')
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    } );
+</script>
+@endsection

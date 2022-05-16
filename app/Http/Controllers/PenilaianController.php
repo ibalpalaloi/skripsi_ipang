@@ -12,6 +12,8 @@ use App\Tenaga_teknis;
 use App\Variabel_penilaian;
 use App\Wilayah;
 use App\Parameter_penilaian;
+use App\Penilaian;
+use App\Periode;
 use Mockery\Generator\Parameter;
 
 class PenilaianController extends Controller
@@ -26,16 +28,20 @@ class PenilaianController extends Controller
 		return view('/penilaian.daftar_kantor', compact('wilayah'));
 	}
 
-	public function tenaga_teknis($id){
-		$tenaga_teknis = Tenaga_teknis::where('wilayah_id', $id)->get();
+	public function tenaga_teknis($id_kantor, $id_periode){
+		$tenaga_teknis = Tenaga_teknis::where('wilayah_id', $id_kantor)->get();
 		$data_tenaga_teknis = array();
 		$i = 0;
 		foreach($tenaga_teknis as $data){
 			$data_tenaga_teknis[$i]['id'] = $data->id;
 			$data_tenaga_teknis[$i]['nama'] = $data->nama;
 			$data_tenaga_teknis[$i]['no_registrasi'] = $data->no_registrasi;
-			if($data->hasil_penilaian){
-				$nilai = $data->hasil_penilaian->nilai;
+			$hasil_penilaian = Hasil_penilaian::where([
+				['tenaga_teknis_id', $data->id],
+				['periode_id', $id_periode]
+			])->first();
+			if(!empty($hasil_penilaian)){
+				$nilai = $hasil_penilaian->nilai;
 				$data_tenaga_teknis[$i]['nilai'] = $nilai;
 				if($nilai >= 0 && $nilai <= 50){
 					$rentang_nilai = 'Rendah';
@@ -55,10 +61,22 @@ class PenilaianController extends Controller
 			}
 			$i++;
 		}
- 		return view('penilaian.daftar_tenaga_teknis', compact('data_tenaga_teknis', 'id'));
+ 		return view('penilaian.daftar_tenaga_teknis', compact('data_tenaga_teknis', 'id_kantor', 'id_periode'));
 	}
 
-	public function penilaian($id){
+	public function periode($id){
+		$periode = Periode::all();
+		$data_periode = array();
+		$i=0;
+		foreach($periode as $data){
+			$data_periode[$i]['id'] = $data->id;
+			$data_periode[$i]['periode'] = $data->periode;
+			$i++;
+		}
+		return view('penilaian.periode', compact('data_periode', 'id'));
+	}
+
+	public function penilaian($id, $id_periode){
 		$variabel_penilaian = Variabel_penilaian::all();
 		$data_variabel = array();
 		$i=0;
@@ -69,10 +87,10 @@ class PenilaianController extends Controller
 			$i++;
 		}
 		// dd($data_variabel);
-		return view('penilaian.penilaian', compact('variabel_penilaian', 'id', 'data_variabel'));
+		return view('penilaian.penilaian', compact('variabel_penilaian', 'id', 'data_variabel', 'id_periode'));
 	}
 
-	public function post_penilaian(Request $request, $id){
+	public function post_penilaian(Request $request, $id, $id_periode){
 		$data_request = $request->all();
 		// dd($data_request);
 		$variabel_penilaian = Variabel_penilaian::all();
@@ -99,9 +117,20 @@ class PenilaianController extends Controller
 		}
 		
 		$nilai_akhir = 0;
+		Penilaian::where([
+			['tenaga_teknis_id', $id],
+			['periode_id', $id_periode]
+		])->delete();
 
 		foreach($data_variabel_penilaian as $data){
 			$nilai_akhir += $data['nilai_utility'] * $data['nilai_normalisasi'];
+			$periode = new Penilaian;
+			$periode->periode_id = $id_periode;
+			$periode->variabel_penilaian_id =$data['id'];
+			$periode->tenaga_teknis_id = $id;
+			$periode->nilai_normalisasi = $data['nilai_normalisasi'];
+			$periode->utility = $data['nilai_utility'];
+			$periode->save();
 		}
 
 		if($nilai_akhir >= 0 && $nilai_akhir <= 50){
@@ -119,9 +148,13 @@ class PenilaianController extends Controller
 		$hasil_penilaian = new Hasil_penilaian;
 		$hasil_penilaian->tenaga_teknis_id = $id;
 		$hasil_penilaian->nilai = $nilai_akhir;
+		$hasil_penilaian->periode_id =  1;
 		$hasil_penilaian->save();
 
-		return view('penilaian.hasil_penilaian', compact('data_variabel_penilaian', 'nilai_akhir', 'hasil_rentang_nilai'));
+		$tenaga_teknis = Tenaga_teknis::find($id);
+		$id_wilayah = $tenaga_teknis->wilayah_id;
+
+		return view('penilaian.hasil_penilaian', compact('data_variabel_penilaian', 'nilai_akhir', 'hasil_rentang_nilai', 'id_periode', 'id_wilayah'));
 	}
 
 	public function print_tenaga_teknis($id){
@@ -196,5 +229,22 @@ class PenilaianController extends Controller
 		$parameter->save();
 
 		return redirect('/parameter-penilaian/'.$parameter->variabel_penilaian_id);
+	}
+
+	public function detail_penilaian($id, $id_periode){
+		$hasil_penilaian = Hasil_penilaian::where([
+			['tenaga_teknis_id', $id],
+			['periode_id', $id_periode]
+		])->first();
+
+		$penilaian = Penilaian::where([
+			['tenaga_teknis_id', $id],
+			['periode_id', $id_periode]
+		])->get();
+
+		$tenaga_teknis = Tenaga_teknis::find($id);
+		$id_wilayah = $tenaga_teknis->wilayah_id;
+
+		return view('penilaian.detail_penilaian', compact('hasil_penilaian', 'penilaian', 'id_periode', 'id_wilayah'));
 	}
 }
