@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function postlogin(Request $request)
     {
     	if(Auth::attempt($request->only('username','password'))){
-    		return redirect('/home');
+    		return redirect('/home-periode');
     	}
 
     	return redirect('/login/login');

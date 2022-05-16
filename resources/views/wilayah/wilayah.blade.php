@@ -33,6 +33,7 @@ Data Wilayah
                             <td style="text-align: center;">{{$data->wilayah}}</td>
                             <td>
                                 <a href="/hapus-wilayah/{{$data->id}}" type="button" class="btn btn-danger">Hapus</a>
+                                <a href="/ubah-wilayah/{{$data->id}}" type="button" class="btn btn-danger">Edit</a>
                             </td>
                         </tr>
                         @endforeach

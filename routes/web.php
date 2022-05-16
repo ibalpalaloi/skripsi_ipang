@@ -41,7 +41,9 @@ Route::group(['middleware' => ['auth','checkRole:admin,superadmin']],function(){
 	Route::get('/wilayah', 'WilayahController@wilayah');
 	Route::get('/tambah-wilayah', 'WilayahController@tambah_wilayah');
 	Route::post('/post-wilayah', 'WilayahController@post_wilayah');
+	Route::post('/post-ubah-wilayah', 'WilayahController@post_ubah_wilayah');
 	Route::get('/hapus-wilayah/{id}', 'WilayahController@hapus_wilayah');
+	Route::get('/ubah-wilayah/{id}', 'WilayahController@ubah_wilayah');
 
 	// kantor
 	Route::get('/kantor', 'KantorController@kantor');
